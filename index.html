@@ -1,0 +1,1628 @@
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXIOMA - Calculadora Estadística</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #A66D88;
+            --dark: #181626;
+            --secondary: #4A4759;
+            --light-gray: #9997A6;
+            --white: #F2F2F2;
+            --accent: #2D2B3D;
+            /* Color oscuro complementario para la X */
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark);
+            color: var(--white);
+        }
+
+        .calculator {
+            background: linear-gradient(145deg, #1e1a2e, #181626);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .calc-btn {
+            transition: all 0.2s ease;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .calc-btn:active {
+            transform: translateY(1px);
+        }
+
+        .chat-bubble {
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-5px);
+            }
+        }
+
+        .chat-window {
+            transition: all 0.3s ease;
+            transform-origin: bottom right;
+        }
+
+        .chat-message {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-field {
+            background-color: rgba(74, 71, 89, 0.2);
+            border: 1px solid rgba(166, 109, 136, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(166, 109, 136, 0.2);
+        }
+
+        .calculator-type {
+            background-color: rgba(74, 71, 89, 0.2);
+            border: 1px solid rgba(166, 109, 136, 0.3);
+        }
+
+        .result-box {
+            background: linear-gradient(145deg, #4A4759, #3d3a49);
+        }
+
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+
+        .graph-container {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar {
+            position: absolute;
+            bottom: 0;
+            background-color: var(--primary);
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            transition: height 0.5s ease;
+        }
+
+        .x-axis {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--light-gray);
+        }
+
+        .y-axis {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 1px;
+            height: 100%;
+            background-color: var(--light-gray);
+        }
+
+        .chat-option {
+            transition: all 0.2s ease;
+        }
+
+        .chat-option:hover {
+            background-color: rgba(166, 109, 136, 0.2);
+        }
+
+        .facto-box {
+            background: linear-gradient(145deg, #2D2B3D, #232133);
+            border-left: 4px solid var(--primary);
+        }
+
+        .explanation-item {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .explanation-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+    <style>
+        *,
+        ::before,
+        ::after {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        ::backdrop {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        /* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb
+        }
+
+        ::after,
+        ::before {
+            --tw-content: ''
+        }
+
+        :host,
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            margin: 0;
+            line-height: inherit
+        }
+
+        hr {
+            height: 0;
+            color: inherit;
+            border-top-width: 1px
+        }
+
+        abbr:where([title]) {
+            -webkit-text-decoration: underline dotted;
+            text-decoration: underline dotted
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: inherit;
+            font-weight: inherit
+        }
+
+        a {
+            color: inherit;
+            text-decoration: inherit
+        }
+
+        b,
+        strong {
+            font-weight: bolder
+        }
+
+        code,
+        kbd,
+        pre,
+        samp {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            font-size: 1em
+        }
+
+        small {
+            font-size: 80%
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        table {
+            text-indent: 0;
+            border-color: inherit;
+            border-collapse: collapse
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: inherit;
+            font-feature-settings: inherit;
+            font-variation-settings: inherit;
+            font-size: 100%;
+            font-weight: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0
+        }
+
+        button,
+        select {
+            text-transform: none
+        }
+
+        button,
+        input:where([type=button]),
+        input:where([type=reset]),
+        input:where([type=submit]) {
+            -webkit-appearance: button;
+            background-color: transparent;
+            background-image: none
+        }
+
+        :-moz-focusring {
+            outline: auto
+        }
+
+        :-moz-ui-invalid {
+            box-shadow: none
+        }
+
+        progress {
+            vertical-align: baseline
+        }
+
+        ::-webkit-inner-spin-button,
+        ::-webkit-outer-spin-button {
+            height: auto
+        }
+
+        [type=search] {
+            -webkit-appearance: textfield;
+            outline-offset: -2px
+        }
+
+        ::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+
+        ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            font: inherit
+        }
+
+        summary {
+            display: list-item
+        }
+
+        blockquote,
+        dd,
+        dl,
+        figure,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        hr,
+        p,
+        pre {
+            margin: 0
+        }
+
+        fieldset {
+            margin: 0;
+            padding: 0
+        }
+
+        legend {
+            padding: 0
+        }
+
+        menu,
+        ol,
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        dialog {
+            padding: 0
+        }
+
+        textarea {
+            resize: vertical
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            opacity: 1;
+            color: #9ca3af
+        }
+
+        [role=button],
+        button {
+            cursor: pointer
+        }
+
+        :disabled {
+            cursor: default
+        }
+
+        audio,
+        canvas,
+        embed,
+        iframe,
+        img,
+        object,
+        svg,
+        video {
+            display: block;
+            vertical-align: middle
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto
+        }
+
+        [hidden]:where(:not([hidden=until-found])) {
+            display: none
+        }
+
+        .fixed {
+            position: fixed
+        }
+
+        .relative {
+            position: relative
+        }
+
+        .bottom-6 {
+            bottom: 1.5rem
+        }
+
+        .right-6 {
+            right: 1.5rem
+        }
+
+        .z-10 {
+            z-index: 10
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem
+        }
+
+        .mt-4 {
+            margin-top: 1rem
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem
+        }
+
+        .block {
+            display: block
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .h-14 {
+            height: 3.5rem
+        }
+
+        .h-5 {
+            height: 1.25rem
+        }
+
+        .h-6 {
+            height: 1.5rem
+        }
+
+        .h-8 {
+            height: 2rem
+        }
+
+        .h-96 {
+            height: 24rem
+        }
+
+        .h-full {
+            height: 100%
+        }
+
+        .min-h-screen {
+            min-height: 100vh
+        }
+
+        .w-14 {
+            width: 3.5rem
+        }
+
+        .w-5 {
+            width: 1.25rem
+        }
+
+        .w-6 {
+            width: 1.5rem
+        }
+
+        .w-8 {
+            width: 2rem
+        }
+
+        .w-80 {
+            width: 20rem
+        }
+
+        .w-full {
+            width: 100%
+        }
+
+        .max-w-md {
+            max-width: 28rem
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0
+        }
+
+        .scale-0 {
+            --tw-scale-x: 0;
+            --tw-scale-y: 0;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .cursor-pointer {
+            cursor: pointer
+        }
+
+        .flex-col {
+            flex-direction: column
+        }
+
+        .items-start {
+            align-items: flex-start
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-center {
+            justify-content: center
+        }
+
+        .justify-between {
+            justify-content: space-between
+        }
+
+        .overflow-hidden {
+            overflow: hidden
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem
+        }
+
+        .rounded-full {
+            border-radius: 9999px
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem
+        }
+
+        .rounded-tl-none {
+            border-top-left-radius: 0px
+        }
+
+        .border {
+            border-width: 1px
+        }
+
+        .border-\[\#4A4759\] {
+            --tw-border-opacity: 1;
+            border-color: rgb(74 71 89 / var(--tw-border-opacity, 1))
+        }
+
+        .bg-\[\#181626\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(24 22 38 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#2D2B3D\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(45 43 61 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#4A4759\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(74 71 89 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#A66D88\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(166 109 136 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-\[\#F2F2F2\] {
+            --tw-bg-opacity: 1;
+            background-color: rgb(242 242 242 / var(--tw-bg-opacity, 1))
+        }
+
+        .p-2 {
+            padding: 0.5rem
+        }
+
+        .p-3 {
+            padding: 0.75rem
+        }
+
+        .p-4 {
+            padding: 1rem
+        }
+
+        .p-6 {
+            padding: 1.5rem
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+            line-height: 1rem
+        }
+
+        .font-bold {
+            font-weight: 700
+        }
+
+        .font-medium {
+            font-weight: 500
+        }
+
+        .font-semibold {
+            font-weight: 600
+        }
+
+        .text-\[\#2D2B3D\] {
+            --tw-text-opacity: 1;
+            color: rgb(45 43 61 / var(--tw-text-opacity, 1))
+        }
+
+        .text-\[\#9997A6\] {
+            --tw-text-opacity: 1;
+            color: rgb(153 151 166 / var(--tw-text-opacity, 1))
+        }
+
+        .text-\[\#A66D88\] {
+            --tw-text-opacity: 1;
+            color: rgb(166 109 136 / var(--tw-text-opacity, 1))
+        }
+
+        .text-\[\#F2F2F2\] {
+            --tw-text-opacity: 1;
+            color: rgb(242 242 242 / var(--tw-text-opacity, 1))
+        }
+
+        .text-white {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .shadow-lg {
+            --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .hover\:bg-\[\#5a566b\]:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(90 86 107 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:bg-\[\#8e5c74\]:hover {
+            --tw-bg-opacity: 1;
+            background-color: rgb(142 92 116 / var(--tw-bg-opacity, 1))
+        }
+
+        .hover\:text-\[\#F2F2F2\]:hover {
+            --tw-text-opacity: 1;
+            color: rgb(242 242 242 / var(--tw-text-opacity, 1))
+        }
+
+        .focus\:outline-none:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-md calculator rounded-2xl p-6 mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">
+            A<span class="text-[#2D2B3D]">X</span>IOMA
+        </h1>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2 text-[#9997A6]">Tipo de Distribución</label>
+            <select id="calculatorType" class="calculator-type w-full p-3 rounded-lg text-white focus:outline-none">
+                <option value="poisson">Distribución Poisson</option>
+                <option value="exponential">Distribución Exponencial</option>
+            </select>
+        </div>
+
+        <div id="poissonCalculator">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">Lambda (λ) - Tasa media de
+                    ocurrencia</label>
+                <input type="number" id="lambda" min="0" step="0.1"
+                    class="input-field w-full p-3 rounded-lg text-white focus:outline-none"
+                    placeholder="Ingrese lambda (λ)">
+                <p class="text-xs text-[#9997A6] mt-1">Número promedio de eventos en un intervalo</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">k - Número de ocurrencias</label>
+                <input type="number" id="k" min="0" step="1"
+                    class="input-field w-full p-3 rounded-lg text-white focus:outline-none"
+                    placeholder="Ingrese k (número entero)">
+                <p class="text-xs text-[#9997A6] mt-1">Número de eventos para calcular la probabilidad</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">Tipo de Cálculo</label>
+                <select id="poissonCalculationType"
+                    class="calculator-type w-full p-3 rounded-lg text-white focus:outline-none">
+                    <option value="exact">P(X = k) - Probabilidad exacta</option>
+                    <option value="cumulative">P(X ≤ k) - Probabilidad acumulada</option>
+                    <option value="greater">P(X ≥ k) - Probabilidad mayor o igual</option>
+                </select>
+            </div>
+
+            <div class="mb-4 p-3 bg-[#2D2B3D] rounded-lg">
+                <p class="text-sm text-[#F2F2F2] mb-2">Fórmula Poisson:</p>
+                <p class="formula text-center text-[#F2F2F2]">P(X = k) = (e<sup>-λ</sup> × λ<sup>k</sup>) / k!</p>
+            </div>
+        </div>
+
+        <div id="exponentialCalculator" class="hidden">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">Lambda (λ) - Tasa de eventos</label>
+                <input type="number" id="expLambda" min="0" step="0.1"
+                    class="input-field w-full p-3 rounded-lg text-white focus:outline-none"
+                    placeholder="Ingrese lambda (λ)">
+                <p class="text-xs text-[#9997A6] mt-1">Número promedio de eventos por unidad de tiempo</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">x - Tiempo hasta el evento</label>
+                <input type="number" id="x" min="0" step="0.1"
+                    class="input-field w-full p-3 rounded-lg text-white focus:outline-none"
+                    placeholder="Ingrese x (tiempo)">
+                <p class="text-xs text-[#9997A6] mt-1">Tiempo para calcular la probabilidad</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-[#9997A6]">Tipo de Cálculo</label>
+                <select id="expCalculationType"
+                    class="calculator-type w-full p-3 rounded-lg text-white focus:outline-none">
+                    <option value="density">f(x) - Función de densidad</option>
+                    <option value="cumulative">P(X ≤ x) - Probabilidad acumulada</option>
+                    <option value="greater">P(X ≥ x) - Probabilidad mayor o igual</option>
+                </select>
+            </div>
+
+            <div class="mb-4 p-3 bg-[#2D2B3D] rounded-lg">
+                <p class="text-sm text-[#F2F2F2] mb-2">Fórmula Exponencial:</p>
+                <p class="formula text-center text-[#F2F2F2]">f(x) = λe<sup>-λx</sup> para x ≥ 0</p>
+            </div>
+        </div>
+
+        <button id="calculateBtn"
+            class="w-full bg-[#A66D88] hover:bg-[#8e5c74] text-white font-medium py-3 px-4 rounded-lg transition-all calc-btn">
+            Calcular
+        </button>
+
+        <div class="mt-6 result-box p-4 rounded-lg">
+            <p class="text-sm text-[#9997A6] mb-1">Resultado:</p>
+            <p id="result" class="text-xl font-semibold text-white">-</p>
+            <div id="resultExplanation" class="mt-2 text-sm text-[#F2F2F2] hidden">
+                <!-- Explanation will be inserted here -->
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <p class="text-sm text-[#9997A6] mb-2">Visualización:</p>
+            <div id="graphContainer" class="graph-container bg-[#2D2B3D] rounded-lg p-2">
+                <div class="y-axis"></div>
+                <div class="x-axis"></div>
+                <div id="graph" class="relative h-full w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Bot -->
+    <div class="fixed bottom-6 right-6 z-10">
+        <div id="chatWindow"
+            class="chat-window hidden bg-[#181626] rounded-lg shadow-lg w-80 mb-4 border border-[#4A4759] overflow-hidden scale-0">
+            <div class="bg-[#A66D88] p-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div
+                        class="w-8 h-8 rounded-full bg-[#F2F2F2] flex items-center justify-center text-[#A66D88] font-bold">
+                        C</div>
+                    <span class="ml-2 text-white font-medium">CirilBot</span>
+                </div>
+                <button id="closeChat" class="text-white hover:text-[#F2F2F2]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="chatContent" class="p-3 h-96 overflow-y-auto">
+                <div class="mb-4">
+                    <p class="text-[#F2F2F2] mb-3">¡Hola! Soy CirilBot. Selecciona una pregunta para aprender sobre
+                        distribuciones estadísticas:</p>
+
+                    <div id="poissonQuestions">
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="poisson-basic">
+                            <p class="text-sm text-[#F2F2F2]">¿Qué es la distribución Poisson y cuándo se usa?</p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="poisson-example">
+                            <p class="text-sm text-[#F2F2F2]">Muéstrame un ejemplo de cálculo con Poisson</p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="poisson-lambda">
+                            <p class="text-sm text-[#F2F2F2]">¿Qué significa lambda (λ) en la distribución Poisson?</p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="poisson-cumulative">
+                            <p class="text-sm text-[#F2F2F2]">¿Cómo interpreto la probabilidad acumulada en Poisson?</p>
+                        </div>
+                    </div>
+
+                    <div id="exponentialQuestions" class="hidden">
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="exp-basic">
+                            <p class="text-sm text-[#F2F2F2]">¿Qué es la distribución Exponencial y cuándo se usa?</p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="exp-example">
+                            <p class="text-sm text-[#F2F2F2]">Muéstrame un ejemplo de cálculo Exponencial</p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="exp-lambda">
+                            <p class="text-sm text-[#F2F2F2]">¿Qué significa lambda (λ) en la distribución Exponencial?
+                            </p>
+                        </div>
+                        <div class="chat-option p-2 rounded-lg border border-[#4A4759] mb-2 cursor-pointer"
+                            data-question="exp-relation">
+                            <p class="text-sm text-[#F2F2F2]">¿Cuál es la relación entre Poisson y Exponencial?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatResponse" class="hidden">
+                    <div class="flex items-start mb-4">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#A66D88] flex-shrink-0 flex items-center justify-center text-white font-bold mt-1">
+                            C</div>
+                        <div class="ml-2 bg-[#4A4759] p-3 rounded-lg rounded-tl-none">
+                            <div id="responseContent" class="text-sm text-white"></div>
+                        </div>
+                    </div>
+
+                    <div id="factoBox" class="facto-box p-3 rounded-lg mt-4 mb-4">
+                        <p class="text-xs font-bold text-[#A66D88] mb-1">FACTO ESTADÍSTICO:</p>
+                        <p id="factoContent" class="text-sm text-[#F2F2F2]"></p>
+                    </div>
+
+                    <button id="backToQuestions"
+                        class="w-full bg-[#4A4759] hover:bg-[#5a566b] text-white font-medium py-2 px-4 rounded-lg transition-all">
+                        Volver a las preguntas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button id="chatButton"
+            class="bg-[#A66D88] w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-[#8e5c74] transition-all">
+            <div class="chat-bubble">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                    </path>
+                </svg>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Calculator Type Toggle
+            const calculatorType = document.getElementById('calculatorType');
+            const poissonCalculator = document.getElementById('poissonCalculator');
+            const exponentialCalculator = document.getElementById('exponentialCalculator');
+            const poissonQuestions = document.getElementById('poissonQuestions');
+            const exponentialQuestions = document.getElementById('exponentialQuestions');
+
+            calculatorType.addEventListener('change', function () {
+                if (this.value === 'poisson') {
+                    poissonCalculator.classList.remove('hidden');
+                    exponentialCalculator.classList.add('hidden');
+                    poissonQuestions.classList.remove('hidden');
+                    exponentialQuestions.classList.add('hidden');
+                } else {
+                    poissonCalculator.classList.add('hidden');
+                    exponentialCalculator.classList.remove('hidden');
+                    poissonQuestions.classList.add('hidden');
+                    exponentialQuestions.classList.remove('hidden');
+                }
+                clearGraph();
+            });
+
+            // Calculate Button
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultElement = document.getElementById('result');
+            const resultExplanation = document.getElementById('resultExplanation');
+
+            calculateBtn.addEventListener('click', function () {
+                let result;
+                let explanation = '';
+
+                if (calculatorType.value === 'poisson') {
+                    const lambda = parseFloat(document.getElementById('lambda').value);
+                    const k = parseInt(document.getElementById('k').value);
+                    const calculationType = document.getElementById('poissonCalculationType').value;
+
+                    if (isNaN(lambda) || isNaN(k) || lambda < 0 || k < 0) {
+                        resultElement.textContent = 'Por favor ingrese valores válidos (λ > 0, k ≥ 0)';
+                        resultExplanation.classList.add('hidden');
+                        return;
+                    }
+
+                    switch (calculationType) {
+                        case 'exact':
+                            result = poissonProbability(lambda, k);
+                            resultElement.textContent = `P(X = ${k}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">La probabilidad de que ocurran <span class="highlight">exactamente ${k} eventos</span> cuando el promedio es <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Usando la fórmula: P(X = k) = (e<sup>-λ</sup> × λ<sup>k</sup>) / k!</div>
+                                <div class="explanation-item">Resultado: <span class="highlight">${(result * 100).toFixed(4)}%</span> de probabilidad</div>
+                            `;
+                            break;
+                        case 'cumulative':
+                            result = poissonCumulativeProbability(lambda, k);
+                            resultElement.textContent = `P(X ≤ ${k}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">La probabilidad de que ocurran <span class="highlight">a lo sumo ${k} eventos</span> cuando el promedio es <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Suma de probabilidades desde 0 hasta ${k}</div>
+                                <div class="explanation-item">Resultado: <span class="highlight">${(result * 100).toFixed(4)}%</span> de probabilidad</div>
+                            `;
+                            break;
+                        case 'greater':
+                            result = 1 - poissonCumulativeProbability(lambda, k - 1);
+                            resultElement.textContent = `P(X ≥ ${k}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">La probabilidad de que ocurran <span class="highlight">al menos ${k} eventos</span> cuando el promedio es <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Calculado como: 1 - P(X ≤ ${k - 1})</div>
+                                <div class="explanation-item">Resultado: <span class="highlight">${(result * 100).toFixed(4)}%</span> de probabilidad</div>
+                            `;
+                            break;
+                    }
+
+                    // Generate Poisson distribution graph
+                    generatePoissonGraph(lambda, k);
+
+                } else {
+                    const lambda = parseFloat(document.getElementById('expLambda').value);
+                    const x = parseFloat(document.getElementById('x').value);
+                    const calculationType = document.getElementById('expCalculationType').value;
+
+                    if (isNaN(lambda) || isNaN(x) || lambda <= 0 || x < 0) {
+                        resultElement.textContent = 'Por favor ingrese valores válidos (λ > 0, x ≥ 0)';
+                        resultExplanation.classList.add('hidden');
+                        return;
+                    }
+
+                    switch (calculationType) {
+                        case 'density':
+                            result = exponentialDensity(lambda, x);
+                            resultElement.textContent = `f(${x}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">El valor de la función de densidad en <span class="highlight">x = ${x}</span> con tasa <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Usando la fórmula: f(x) = λe<sup>-λx</sup></div>
+                                <div class="explanation-item">Este valor representa la densidad de probabilidad en ese punto</div>
+                            `;
+                            break;
+                        case 'cumulative':
+                            result = exponentialCumulativeProbability(lambda, x);
+                            resultElement.textContent = `P(X ≤ ${x}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">La probabilidad de que el tiempo sea <span class="highlight">menor o igual a ${x}</span> con tasa <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Usando la fórmula: F(x) = 1 - e<sup>-λx</sup></div>
+                                <div class="explanation-item">Resultado: <span class="highlight">${(result * 100).toFixed(4)}%</span> de probabilidad</div>
+                            `;
+                            break;
+                        case 'greater':
+                            result = 1 - exponentialCumulativeProbability(lambda, x);
+                            resultElement.textContent = `P(X ≥ ${x}) = ${result.toFixed(6)}`;
+                            explanation = `
+                                <div class="explanation-item">La probabilidad de que el tiempo sea <span class="highlight">mayor o igual a ${x}</span> con tasa <span class="highlight">λ = ${lambda}</span></div>
+                                <div class="explanation-item">Calculado como: e<sup>-λx</sup></div>
+                                <div class="explanation-item">Resultado: <span class="highlight">${(result * 100).toFixed(4)}%</span> de probabilidad</div>
+                            `;
+                            break;
+                    }
+
+                    // Generate Exponential distribution graph
+                    generateExponentialGraph(lambda, x);
+                }
+
+                // Show explanation
+                resultExplanation.innerHTML = explanation;
+                resultExplanation.classList.remove('hidden');
+            });
+
+            // Poisson Distribution Functions
+            function factorial(n) {
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                }
+                return result;
+            }
+
+            function poissonProbability(lambda, k) {
+                // P(X = k) = (e^(-lambda) * lambda^k) / k!
+                const numerator = Math.exp(-lambda) * Math.pow(lambda, k);
+                const denominator = factorial(k);
+                return numerator / denominator;
+            }
+
+            function poissonCumulativeProbability(lambda, k) {
+                // P(X ≤ k) = sum(P(X = i)) for i from 0 to k
+                let sum = 0;
+                for (let i = 0; i <= k; i++) {
+                    sum += poissonProbability(lambda, i);
+                }
+                return sum;
+            }
+
+            // Exponential Distribution Functions
+            function exponentialDensity(lambda, x) {
+                // f(x) = lambda * e^(-lambda * x)
+                return lambda * Math.exp(-lambda * x);
+            }
+
+            function exponentialCumulativeProbability(lambda, x) {
+                // F(x) = 1 - e^(-lambda * x)
+                return 1 - Math.exp(-lambda * x);
+            }
+
+            // Graph Generation Functions
+            function clearGraph() {
+                const graphElement = document.getElementById('graph');
+                graphElement.innerHTML = '';
+            }
+
+            function generatePoissonGraph(lambda, k) {
+                clearGraph();
+                const graphElement = document.getElementById('graph');
+                const maxK = Math.max(Math.ceil(lambda * 2), k + 5);
+                const values = [];
+
+                // Calculate probabilities
+                for (let i = 0; i <= maxK; i++) {
+                    values.push({
+                        k: i,
+                        probability: poissonProbability(lambda, i)
+                    });
+                }
+
+                // Find max probability for scaling
+                const maxProb = Math.max(...values.map(v => v.probability));
+
+                // Generate bars
+                const barWidth = 100 / (maxK + 1);
+                values.forEach(value => {
+                    const height = (value.probability / maxProb) * 100;
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.left = `${value.k * barWidth}%`;
+                    bar.style.width = `${barWidth * 0.8}%`;
+                    bar.style.height = `${height}%`;
+
+                    // Highlight the selected k
+                    if (value.k === k) {
+                        bar.style.backgroundColor = '#F2F2F2';
+                    }
+
+                    // Add tooltip
+                    bar.title = `k=${value.k}, P(X=${value.k})=${value.probability.toFixed(6)}`;
+
+                    graphElement.appendChild(bar);
+                });
+            }
+
+            function generateExponentialGraph(lambda, x) {
+                clearGraph();
+                const graphElement = document.getElementById('graph');
+                const maxX = Math.max(5 / lambda, x * 1.5);
+                const points = 20;
+                const values = [];
+
+                // Calculate densities
+                for (let i = 0; i <= points; i++) {
+                    const currentX = (i / points) * maxX;
+                    values.push({
+                        x: currentX,
+                        density: exponentialDensity(lambda, currentX)
+                    });
+                }
+
+                // Find max density for scaling
+                const maxDensity = Math.max(...values.map(v => v.density));
+
+                // Generate curve using SVG
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("width", "100%");
+                svg.setAttribute("height", "100%");
+
+                // Create path for the curve
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let pathData = `M 0,${100 - (values[0].density / maxDensity) * 100}`;
+
+                values.forEach((value, index) => {
+                    if (index > 0) {
+                        const xPos = (value.x / maxX) * 100;
+                        const yPos = 100 - (value.density / maxDensity) * 100;
+                        pathData += ` L ${xPos},${yPos}`;
+                    }
+                });
+
+                path.setAttribute("d", pathData);
+                path.setAttribute("stroke", "#A66D88");
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("fill", "none");
+
+                svg.appendChild(path);
+
+                // Add marker for the selected x
+                if (x <= maxX) {
+                    const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    const xPos = (x / maxX) * 100;
+                    const yPos = 100 - (exponentialDensity(lambda, x) / maxDensity) * 100;
+
+                    marker.setAttribute("cx", xPos);
+                    marker.setAttribute("cy", yPos);
+                    marker.setAttribute("r", "4");
+                    marker.setAttribute("fill", "#F2F2F2");
+
+                    svg.appendChild(marker);
+
+                    // Add vertical line to x-axis
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", xPos);
+                    line.setAttribute("y1", yPos);
+                    line.setAttribute("x2", xPos);
+                    line.setAttribute("y2", 100);
+                    line.setAttribute("stroke", "#F2F2F2");
+                    line.setAttribute("stroke-width", "1");
+                    line.setAttribute("stroke-dasharray", "2,2");
+
+                    svg.appendChild(line);
+                }
+
+                graphElement.appendChild(svg);
+            }
+
+            // Chat Bot Functionality
+            const chatButton = document.getElementById('chatButton');
+            const chatWindow = document.getElementById('chatWindow');
+            const closeChat = document.getElementById('closeChat');
+            const chatOptions = document.querySelectorAll('.chat-option');
+            const chatResponse = document.getElementById('chatResponse');
+            const responseContent = document.getElementById('responseContent');
+            const factoContent = document.getElementById('factoContent');
+            const backToQuestions = document.getElementById('backToQuestions');
+
+            chatButton.addEventListener('click', function () {
+                chatWindow.classList.toggle('hidden');
+                if (!chatWindow.classList.contains('hidden')) {
+                    setTimeout(() => {
+                        chatWindow.style.transform = 'scale(1)';
+                    }, 10);
+                } else {
+                    chatWindow.style.transform = 'scale(0)';
+                }
+            });
+
+            closeChat.addEventListener('click', function () {
+                chatWindow.style.transform = 'scale(0)';
+                setTimeout(() => {
+                    chatWindow.classList.add('hidden');
+                }, 300);
+            });
+
+            // Facts database
+            const factos = [
+                "La distribución de Poisson fue descubierta por Siméon Denis Poisson en 1837.",
+                "La distribución exponencial es la única distribución continua sin memoria.",
+                "La media y la varianza de una distribución Poisson son iguales al parámetro λ.",
+                "La distribución de Poisson se aproxima a la normal cuando λ es grande (λ > 10).",
+                "La distribución exponencial describe el tiempo entre eventos en un proceso de Poisson.",
+                "El valor esperado (media) de una distribución exponencial es 1/λ.",
+                "La distribución de Poisson se usa para modelar el número de llamadas telefónicas recibidas por minuto.",
+                "La distribución exponencial se utiliza en estudios de fiabilidad para modelar el tiempo hasta el fallo.",
+                "La función de supervivencia de la distribución exponencial decrece exponencialmente.",
+                "La distribución de Poisson puede derivarse como límite de la distribución binomial."
+            ];
+
+            // Get random facto
+            function getRandomFacto() {
+                const randomIndex = Math.floor(Math.random() * factos.length);
+                return factos[randomIndex];
+            }
+
+            // Chat responses
+            const chatResponses = {
+                'poisson-basic': {
+                    content: `
+                        <p class="mb-2"><span class="highlight">La distribución de Poisson</span> modela el número de eventos que ocurren en un intervalo fijo de tiempo o espacio cuando estos eventos ocurren con una tasa constante conocida y de manera independiente.</p>
+                        <p class="mb-2">Se utiliza cuando:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">Los eventos ocurren de forma aleatoria</li>
+                            <li class="explanation-item">Conocemos la tasa media de ocurrencia (λ)</li>
+                            <li class="explanation-item">Los eventos son independientes entre sí</li>
+                        </ul>
+                        <p>Ejemplos: número de clientes que llegan a una tienda por hora, número de errores en un libro, número de llamadas a un call center.</p>
+                    `,
+                    example: {
+                        type: 'poisson',
+                        lambda: 3,
+                        k: 2,
+                        calcType: 'exact'
+                    }
+                },
+                'poisson-example': {
+                    content: `
+                        <p class="mb-2"><span class="highlight">Ejemplo práctico:</span> Un centro de llamadas recibe en promedio 5 llamadas por hora.</p>
+                        <p class="mb-2">¿Cuál es la probabilidad de recibir exactamente 3 llamadas en una hora?</p>
+                        <p class="mb-2">Usamos la distribución Poisson con λ = 5 y k = 3:</p>
+                        <p class="mb-2">P(X = 3) = (e<sup>-5</sup> × 5<sup>3</sup>) / 3!</p>
+                        <p class="mb-2">= (0.0067 × 125) / 6 = 0.1404</p>
+                        <p>Hay un 14.04% de probabilidad de recibir exactamente 3 llamadas en una hora.</p>
+                    `,
+                    example: {
+                        type: 'poisson',
+                        lambda: 5,
+                        k: 3,
+                        calcType: 'exact'
+                    }
+                },
+                'poisson-lambda': {
+                    content: `
+                        <p class="mb-2">En la distribución Poisson, <span class="highlight">lambda (λ)</span> representa la tasa media de ocurrencia de eventos en el intervalo de interés.</p>
+                        <p class="mb-2">Características importantes de λ:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">Es el único parámetro que necesitamos para definir la distribución</li>
+                            <li class="explanation-item">Representa tanto la media como la varianza de la distribución</li>
+                            <li class="explanation-item">Debe ser constante durante todo el intervalo</li>
+                        </ul>
+                        <p>Por ejemplo, si λ = 2.5, significa que en promedio ocurren 2.5 eventos en el intervalo de tiempo o espacio considerado.</p>
+                    `,
+                    example: {
+                        type: 'poisson',
+                        lambda: 2.5,
+                        k: 3,
+                        calcType: 'exact'
+                    }
+                },
+                'poisson-cumulative': {
+                    content: `
+                        <p class="mb-2">La <span class="highlight">probabilidad acumulada</span> en la distribución Poisson representa la probabilidad de que ocurran a lo sumo k eventos.</p>
+                        <p class="mb-2">P(X ≤ k) = P(X = 0) + P(X = 1) + ... + P(X = k)</p>
+                        <p class="mb-2">Interpretación:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">P(X ≤ k): probabilidad de que ocurran k eventos o menos</li>
+                            <li class="explanation-item">P(X ≥ k): probabilidad de que ocurran k eventos o más</li>
+                            <li class="explanation-item">P(X = k): probabilidad de que ocurran exactamente k eventos</li>
+                        </ul>
+                        <p>Ejemplo: Si P(X ≤ 3) = 0.8, significa que hay un 80% de probabilidad de que ocurran 3 eventos o menos.</p>
+                    `,
+                    example: {
+                        type: 'poisson',
+                        lambda: 4,
+                        k: 3,
+                        calcType: 'cumulative'
+                    }
+                },
+                'exp-basic': {
+                    content: `
+                        <p class="mb-2">La <span class="highlight">distribución Exponencial</span> modela el tiempo entre eventos consecutivos en un proceso de Poisson.</p>
+                        <p class="mb-2">Se utiliza cuando:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">Modelamos el tiempo hasta que ocurre un evento</li>
+                            <li class="explanation-item">La tasa de ocurrencia es constante (λ)</li>
+                            <li class="explanation-item">El proceso no tiene memoria (propiedad markoviana)</li>
+                        </ul>
+                        <p>Ejemplos: tiempo entre llegadas de clientes, tiempo de vida de componentes electrónicos, tiempo de espera entre llamadas telefónicas.</p>
+                    `,
+                    example: {
+                        type: 'exponential',
+                        lambda: 0.5,
+                        x: 2,
+                        calcType: 'cumulative'
+                    }
+                },
+                'exp-example': {
+                    content: `
+                        <p class="mb-2"><span class="highlight">Ejemplo práctico:</span> Los clientes llegan a una tienda a una tasa promedio de 3 por hora.</p>
+                        <p class="mb-2">¿Cuál es la probabilidad de que pasen más de 30 minutos (0.5 horas) hasta que llegue el próximo cliente?</p>
+                        <p class="mb-2">Usamos la distribución Exponencial con λ = 3 y x = 0.5:</p>
+                        <p class="mb-2">P(X > 0.5) = e<sup>-3×0.5</sup> = e<sup>-1.5</sup> = 0.2231</p>
+                        <p>Hay un 22.31% de probabilidad de que pasen más de 30 minutos hasta la próxima llegada.</p>
+                    `,
+                    example: {
+                        type: 'exponential',
+                        lambda: 3,
+                        x: 0.5,
+                        calcType: 'greater'
+                    }
+                },
+                'exp-lambda': {
+                    content: `
+                        <p class="mb-2">En la distribución Exponencial, <span class="highlight">lambda (λ)</span> representa la tasa de ocurrencia de eventos por unidad de tiempo o espacio.</p>
+                        <p class="mb-2">Características importantes de λ:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">Es el único parámetro que define la distribución</li>
+                            <li class="explanation-item">La media (valor esperado) de la distribución es 1/λ</li>
+                            <li class="explanation-item">La desviación estándar también es 1/λ</li>
+                        </ul>
+                        <p>Por ejemplo, si λ = 2, significa que ocurren en promedio 2 eventos por unidad de tiempo, y el tiempo promedio entre eventos es 1/2 = 0.5 unidades.</p>
+                    `,
+                    example: {
+                        type: 'exponential',
+                        lambda: 2,
+                        x: 0.5,
+                        calcType: 'density'
+                    }
+                },
+                'exp-relation': {
+                    content: `
+                        <p class="mb-2">La <span class="highlight">relación entre Poisson y Exponencial</span> es fundamental en la teoría de procesos estocásticos:</p>
+                        <ul class="mb-2">
+                            <li class="explanation-item">Si los eventos ocurren según un proceso de Poisson con tasa λ, entonces el tiempo entre eventos consecutivos sigue una distribución Exponencial con parámetro λ</li>
+                            <li class="explanation-item">Si N(t) cuenta el número de eventos hasta el tiempo t en un proceso de Poisson, entonces N(t) ~ Poisson(λt)</li>
+                            <li class="explanation-item">Si T representa el tiempo hasta el primer evento, entonces T ~ Exponencial(λ)</li>
+                        </ul>
+                        <p>Son dos caras de la misma moneda: Poisson cuenta eventos, Exponencial mide el tiempo entre ellos.</p>
+                    `,
+                    example: {
+                        type: 'exponential',
+                        lambda: 1,
+                        x: 1,
+                        calcType: 'cumulative'
+                    }
+                }
+            };
+
+            // Handle chat option clicks
+            chatOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    const questionType = this.getAttribute('data-question');
+                    const response = chatResponses[questionType];
+
+                    if (response) {
+                        // Show response
+                        responseContent.innerHTML = response.content;
+                        factoContent.textContent = getRandomFacto();
+
+                        // Hide questions, show response
+                        document.getElementById('poissonQuestions').classList.add('hidden');
+                        document.getElementById('exponentialQuestions').classList.add('hidden');
+                        chatResponse.classList.remove('hidden');
+
+                        // Set calculator values based on example
+                        if (response.example) {
+                            const example = response.example;
+
+                            if (example.type === 'poisson') {
+                                // Switch to Poisson calculator if needed
+                                if (calculatorType.value !== 'poisson') {
+                                    calculatorType.value = 'poisson';
+                                    poissonCalculator.classList.remove('hidden');
+                                    exponentialCalculator.classList.add('hidden');
+                                }
+
+                                // Set values
+                                document.getElementById('lambda').value = example.lambda;
+                                document.getElementById('k').value = example.k;
+                                document.getElementById('poissonCalculationType').value = example.calcType;
+
+                                // Calculate
+                                calculateBtn.click();
+
+                            } else if (example.type === 'exponential') {
+                                // Switch to Exponential calculator if needed
+                                if (calculatorType.value !== 'exponential') {
+                                    calculatorType.value = 'exponential';
+                                    poissonCalculator.classList.add('hidden');
+                                    exponentialCalculator.classList.remove('hidden');
+                                }
+
+                                // Set values
+                                document.getElementById('expLambda').value = example.lambda;
+                                document.getElementById('x').value = example.x;
+                                document.getElementById('expCalculationType').value = example.calcType;
+
+                                // Calculate
+                                calculateBtn.click();
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Back to questions button
+            backToQuestions.addEventListener('click', function () {
+                chatResponse.classList.add('hidden');
+
+                // Show appropriate question set based on current calculator type
+                if (calculatorType.value === 'poisson') {
+                    document.getElementById('poissonQuestions').classList.remove('hidden');
+                } else {
+                    document.getElementById('exponentialQuestions').classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'948fbb6e62ce8e03',t:'MTc0ODc5MTYxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    <iframe height="1" width="1"
+        style="position: absolute; top: 0px; left: 0px; border: medium; visibility: hidden;"></iframe>
+
+</body>
+
+</html>
